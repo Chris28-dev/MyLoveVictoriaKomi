@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f0f2f5;
+        }
+        #chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        .user {
+            align-self: flex-end;
+            background-color: #0084ff;
+            color: white;
+        }
+        .bot {
+            align-self: flex-start;
+            background-color: #e4e6eb;
+            color: black;
+        }
+        #options-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #ddd;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        .question-btn {
+            padding: 12px 16px;
+            border: 1px solid #0084ff;
+            border-radius: 20px;
+            background-color: white;
+            color: #0084ff;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .question-btn:active {
+            background-color: #0084ff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chat-box"></div>
+    <div id="options-area"></div>
+
+    <script>
+        // ==========================================
+        // EDIT YOUR QUESTIONS AND ANSWERS BELOW
+        // ==========================================
+
+        const CHAT_DATA = {
+            // 1. The very first question the bot asks
+            initialQuestion: "ΠΟΙΟΣ ΕΙΣΑΙ!",
+
+            // 2. Option A: Gives one direct answer and ends
+            option1: {
+                buttonText: "Δεν είμαι η Βικτορία Κόμη",
+                botReply: "Να πας να γαμηθείς"
+            },
+
+            // 3. Option B: Opens up the 4 follow-up questions
+            option2: {
+                buttonText: "Η Βικτωρία Κόμη",
+                botReply: "Πες μου, τι θα ήθελες να μάθεις",
+                followUpQuestions: [
+                    {
+                        question: "Με αγαπάει ο Χρήστος Πασσαλής(Αρκούδος)",
+                        answer: "Ναι, θα σε αγαπάει για πάντα"
+                    },
+                    {
+                        question: "Ποια είναι η πιο όμορφη γυναίκα στον κόσμο?",
+                        answer: "Εσύ"
+                    },
+                    {
+                        question: "Ποιο είναι το πιο γλυκό μωράκι?",
+                        answer: "Η Βηκτωρία"
+                    },
+                    {
+                        question: "Τι είναι η Βικτωρία?",
+                        answer: "Το πιο όμορφο λουλουδάκι"
+                    }
+                ]
+            }
+        };
+
+        // ==========================================
+        // CHAT LOGIC (NO NEED TO EDIT BELOW)
+        // ==========================================
+
+        const chatBox = document.getElementById('chat-box');
+        const optionsArea = document.getElementById('options-area');
+
+        function addMessage(text, sender) {
+            const msg = document.createElement('div');
+            msg.className = 'message ' + sender;
+            msg.textContent = text;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function startChat() {
+            chatBox.innerHTML = '';
+            optionsArea.innerHTML = '';
+
+            // Bot asks the initial question
+            addMessage(CHAT_DATA.initialQuestion, 'bot');
+
+            // Create Button 1 (Leads to single answer)
+            const btn1 = document.createElement('button');
+            btn1.className = 'question-btn';
+            btn1.textContent = CHAT_DATA.option1.buttonText;
+            btn1.onclick = () => chooseOption1();
+
+            // Create Button 2 (Leads to 4 questions)
+            const btn2 = document.createElement('button');
+            btn2.className = 'question-btn';
+            btn2.textContent = CHAT_DATA.option2.buttonText;
+            btn2.onclick = () => chooseOption2();
+
+            optionsArea.appendChild(btn1);
+            optionsArea.appendChild(btn2);
+        }
+
+        function chooseOption1() {
+            addMessage(CHAT_DATA.option1.buttonText, 'user');
+            optionsArea.innerHTML = ''; // Clear buttons while bot "types"
+
+            setTimeout(() => {
+                addMessage(CHAT_DATA.option1.botReply, 'bot');
+                showResetButton();
+            }, 500);
+        }
+
+        function chooseOption2() {
+            addMessage(CHAT_DATA.option2.buttonText, 'user');
+            optionsArea.innerHTML = ''; // Clear initial 2 buttons
+
+            setTimeout(() => {
+                addMessage(CHAT_DATA.option2.botReply, 'bot');
+                showFollowUpQuestions();
+            }, 500);
+        }
+
+        function showFollowUpQuestions() {
+            CHAT_DATA.option2.followUpQuestions.forEach(pair => {
+                const btn = document.createElement('button');
+                btn.className = 'question-btn';
+                btn.textContent = pair.question;
+                btn.onclick = () => {
+                    addMessage(pair.question, 'user');
+                    setTimeout(() => {
+                        addMessage(pair.answer, 'bot');
+                    }, 500);
+                };
+                optionsArea.appendChild(btn);
+            });
+
+            showResetButton();
+        }
+
+        function showResetButton() {
+            const resetBtn = document.createElement('button');
+            resetBtn.className = 'question-btn reset-btn';
+            resetBtn.textContent = "↺ Start Over";
+            resetBtn.onclick = startChat;
+            optionsArea.appendChild(resetBtn);
+        }
+
+        // Initialize the chat when the page loads
+        startChat();
+    </script>
+
+</body>
+</html>
