@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
+    <title>Special Chat</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -11,8 +11,76 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: #f0f2f5;
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            overflow: hidden;
+            position: relative;
         }
+
+        /* Floating Hearts Background */
+        .heart-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .floating-heart {
+            position: absolute;
+            bottom: -50px;
+            color: rgba(255, 255, 255, 0.4);
+            animation: floatUp 6s linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.6); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-105vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Main Container Layout */
+        #main-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Image Display Area */
+        #image-display-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .side-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 2px solid #ff4b6e;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .center-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 3px solid #ff4b6e;
+            box-shadow: 0 6px 15px rgba(255,75,110,0.3);
+        }
+
         #chat-box {
             flex: 1;
             padding: 15px;
@@ -23,26 +91,29 @@
         }
         .message {
             max-width: 75%;
-            padding: 10px 14px;
+            padding: 12px 16px;
             border-radius: 18px;
             font-size: 16px;
             line-height: 1.4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .user {
             align-self: flex-end;
-            background-color: #0084ff;
+            background-color: #ff4b6e;
             color: white;
         }
         .bot {
             align-self: flex-start;
-            background-color: #e4e6eb;
-            color: black;
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #eee;
         }
+
         #options-area {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 12px;
+            padding: 15px;
             background: white;
             border-top: 1px solid #ddd;
             max-height: 40vh;
@@ -50,26 +121,44 @@
         }
         .question-btn {
             padding: 12px 16px;
-            border: 1px solid #0084ff;
+            border: 1px solid #ff4b6e;
             border-radius: 20px;
             background-color: white;
-            color: #0084ff;
+            color: #ff4b6e;
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             text-align: left;
-            transition: background-color 0.2s, color 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
         .question-btn:active {
-            background-color: #0084ff;
+            background-color: #ff4b6e;
             color: white;
+        }
+        .reset-btn {
+            border-color: #aaa;
+            color: #666;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div id="chat-box"></div>
-    <div id="options-area"></div>
+    <!-- Floating Background Hearts -->
+    <div class="heart-bg" id="heart-container"></div>
+
+    <div id="main-container">
+        <!-- Pictures Section -->
+        <div id="image-display-area">
+            <img src="Left.jpg" alt="Left" class="side-img">
+            <img src="Center.jpg" alt="Center" class="center-img">
+            <img src="Right.jpg" alt="Right" class="side-img">
+        </div>
+
+        <div id="chat-box"></div>
+        <div id="options-area"></div>
+    </div>
 
     <script>
         // ==========================================
@@ -77,16 +166,14 @@
         // ==========================================
 
         const CHAT_DATA = {
-            // 1. The very first question the bot asks
+            
             initialQuestion: "ΠΟΙΟΣ ΕΙΣΑΙ!",
 
-            // 2. Option A: Gives one direct answer and ends
             option1: {
                 buttonText: "Δεν είμαι η Βικτορία Κόμη",
                 botReply: "Να πας να γαμηθείς"
             },
 
-            // 3. Option B: Opens up the 4 follow-up questions
             option2: {
                 buttonText: "Η Βικτωρία Κόμη❤️",
                 botReply: "Πες μου, τι θα ήθελες να μάθεις",
@@ -115,6 +202,19 @@
         // CHAT LOGIC (NO NEED TO EDIT BELOW)
         // ==========================================
 
+        const heartContainer = document.getElementById('heart-container');
+        const symbols = ['❤️', '💖', '💕', '💗', '💓'];
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'floating-heart';
+            heart.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            heart.style.animationDelay = (Math.random() * 5) + 's';
+            heartContainer.appendChild(heart);
+        }
+
         const chatBox = document.getElementById('chat-box');
         const optionsArea = document.getElementById('options-area');
 
@@ -130,16 +230,13 @@
             chatBox.innerHTML = '';
             optionsArea.innerHTML = '';
 
-            // Bot asks the initial question
             addMessage(CHAT_DATA.initialQuestion, 'bot');
 
-            // Create Button 1 (Leads to single answer)
             const btn1 = document.createElement('button');
             btn1.className = 'question-btn';
             btn1.textContent = CHAT_DATA.option1.buttonText;
             btn1.onclick = () => chooseOption1();
 
-            // Create Button 2 (Leads to 4 questions)
             const btn2 = document.createElement('button');
             btn2.className = 'question-btn';
             btn2.textContent = CHAT_DATA.option2.buttonText;
@@ -151,7 +248,7 @@
 
         function chooseOption1() {
             addMessage(CHAT_DATA.option1.buttonText, 'user');
-            optionsArea.innerHTML = ''; // Clear buttons while bot "types"
+            optionsArea.innerHTML = '';
 
             setTimeout(() => {
                 addMessage(CHAT_DATA.option1.botReply, 'bot');
@@ -161,7 +258,7 @@
 
         function chooseOption2() {
             addMessage(CHAT_DATA.option2.buttonText, 'user');
-            optionsArea.innerHTML = ''; // Clear initial 2 buttons
+            optionsArea.innerHTML = '';
 
             setTimeout(() => {
                 addMessage(CHAT_DATA.option2.botReply, 'bot');
@@ -194,7 +291,6 @@
             optionsArea.appendChild(resetBtn);
         }
 
-        // Initialize the chat when the page loads
         startChat();
     </script>
 
