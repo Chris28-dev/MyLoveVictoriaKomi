@@ -30,13 +30,15 @@
         .floating-heart {
             position: absolute;
             bottom: -50px;
-            color: rgba(255, 255, 255, 0.5);
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 6px rgba(214, 26, 68, 0.35));
             animation: floatUp 6s linear infinite;
         }
         @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.6); opacity: 0; }
-            50% { opacity: 0.9; }
-            100% { transform: translateY(-105vh) scale(1.2); opacity: 0; }
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { transform: translateY(-108vh) scale(1.3); opacity: 0; }
         }
 
         /* Main Container Layout */
@@ -49,40 +51,57 @@
             max-width: 600px;
             width: 100%;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.12);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             border-left: 1px solid rgba(255, 255, 255, 0.3);
             border-right: 1px solid rgba(255, 255, 255, 0.3);
         }
-        }
 
-        /* Image Display Area */
+        /* Image Display Area - Aligned & Larger */
         #image-display-area {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            gap: 12px;
+            padding: 16px 12px;
+            background: rgba(255, 255, 255, 0.22);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.35);
         }
         .side-img {
-            width: 80px;
-            height: 100px;
+            width: 105px;
+            height: 135px;
             object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #ff4b6e;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            object-position: center;
+            border-radius: 14px;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+            flex-shrink: 0;
         }
         .center-img {
-            width: 150px;
-            height: 150px;
+            width: 165px;
+            height: 165px;
             object-fit: cover;
-            border-radius: 15px;
-            border: 3px solid #ff4b6e;
-            box-shadow: 0 6px 15px rgba(255,75,110,0.3);
+            object-position: center;
+            border-radius: 18px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 6px 18px rgba(255, 42, 85, 0.35);
+            flex-shrink: 0;
+        }
+
+        /* Responsive adjustment for smaller phone screens */
+        @media (max-width: 420px) {
+            #image-display-area {
+                gap: 8px;
+                padding: 12px 8px;
+            }
+            .side-img {
+                width: 88px;
+                height: 115px;
+            }
+            .center-img {
+                width: 142px;
+                height: 142px;
+            }
         }
 
         #chat-box {
@@ -99,8 +118,7 @@
             border-radius: 18px;
             font-size: 16px;
             line-height: 1.4;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
         }
         .user {
             align-self: flex-end;
@@ -109,9 +127,9 @@
         }
         .bot {
             align-self: flex-start;
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.95);
             color: #333;
-            border: 1px solid #eee;
+            border: 1px solid #fff;
         }
 
         #options-area {
@@ -119,24 +137,23 @@
             flex-direction: column;
             gap: 8px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.35);
-            backdrop-filter: blur(5px);
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.28);
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
             max-height: 40vh;
             overflow-y: auto;
         }
         .question-btn {
             padding: 12px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.85);
+            background-color: rgba(255, 255, 255, 0.92);
             color: #d61a44;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             text-align: left;
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
         .question-btn:active {
             background-color: #ff2a55;
@@ -144,7 +161,7 @@
         }
         .reset-btn {
             border-color: rgba(0,0,0,0.2);
-            background-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.75);
             color: #444;
             text-align: center;
         }
@@ -210,13 +227,13 @@
         // ==========================================
 
         const heartContainer = document.getElementById('heart-container');
-        const symbols = ['❤️', '💖', '💕', '💗', '💓'];
-        for (let i = 0; i < 18; i++) {
+        const symbols = ['❤️', '💖', '💕', '💗', '💓', '🩷'];
+        for (let i = 0; i < 30; i++) {
             const heart = document.createElement('div');
             heart.className = 'floating-heart';
             heart.textContent = symbols[Math.floor(Math.random() * symbols.length)];
             heart.style.left = Math.random() * 100 + '%';
-            heart.style.fontSize = (Math.random() * 22 + 16) + 'px';
+            heart.style.fontSize = (Math.random() * 24 + 22) + 'px';
             heart.style.animationDuration = (Math.random() * 5 + 4) + 's';
             heart.style.animationDelay = (Math.random() * 5) + 's';
             heartContainer.appendChild(heart);
